@@ -5,21 +5,8 @@
 
   <groupId>ua.com.contactservice</groupId>
   <artifactId>ContactService</artifactId>
-  <packaging>pom</packaging>
-  <version>1.0-SNAPSHOT</version>
-
-    <parent>
-        <groupId>org.springframework.boot</groupId>
-        <artifactId>spring-boot-starter-parent</artifactId>
-        <version>1.4.2.RELEASE</version>
-    </parent>
-
-    <properties>
-        <spring.version>4.3.4.RELEASE</spring.version>
-    </properties>
-
-    <name>ContactService Maven Webapp</name>
-    <url>http://maven.apache.org</url>
+    <version>1.0-SNAPSHOT</version>
+    <packaging>pom</packaging>
 
     <modules>
         <module>Service</module>
@@ -27,6 +14,14 @@
         <module>Model</module>
         <module>Repository</module>
     </modules>
+
+    <name>ContactService Maven Webapp</name>
+
+    <properties>
+        <spring.version>4.3.4.RELEASE</spring.version>
+        <junit.version>4.12</junit.version>
+    </properties>
+
 
   <dependencyManagement>
     <dependencies>
@@ -71,7 +66,7 @@
       <dependency>
         <groupId>junit</groupId>
         <artifactId>junit</artifactId>
-        <version>4.12</version>
+        <version>${junit.version}</version>
         <scope>test</scope>
       </dependency>
     </dependencies>
