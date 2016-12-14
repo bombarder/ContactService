@@ -12,7 +12,8 @@
         <module>Service</module>
         <module>Controller</module>
         <module>Model</module>
-        <module>Repository</module>
+        <module>DAO</module>
+        <module>Web</module>
     </modules>
 
     <name>ContactService Maven Webapp</name>
