@@ -17,12 +17,12 @@ public class Main {
         Field[] fields = aClass.getDeclaredFields();
         System.out.println("{");
         for (Field field: fields) {
+            field.setAccessible(true);
             boolean annotationPresent = field.isAnnotationPresent(JsonValue.class);
             if (annotationPresent) {
-
+                field.set(object, field.getAnnotation(JsonValue.class).name());
             }
 
-            field.setAccessible(true);
             System.out.println("\""+ field.getName() +"\""+":"+ "\""+field.get(object)+"\",");
         }
         System.out.println("}");
