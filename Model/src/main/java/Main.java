@@ -9,23 +9,25 @@ public class Main {
         customer.setHobby("hockey");
         customer.setBirthDate(LocalDate.of(2000, 9, 12));
 
-        toJson(customer);
+        String s = toJson(customer);
+        System.out.println(s);
     }
 
     public static String toJson(Object object) throws Exception {
+        StringBuilder stringBuilder = new StringBuilder();
         Class<?> aClass = object.getClass();
         Field[] fields = aClass.getDeclaredFields();
-        System.out.println("{");
+        stringBuilder.append("{");
         for (Field field: fields) {
             field.setAccessible(true);
             boolean annotationPresent = field.isAnnotationPresent(JsonValue.class);
             if (annotationPresent) {
                 field.set(object, field.getAnnotation(JsonValue.class).name());
             }
-
-            System.out.println("\""+ field.getName() +"\""+":"+ "\""+field.get(object)+"\",");
+            stringBuilder.append("\""+ field.getName() +"\""+":"+ "\""+field.get(object)+"\",");
         }
-        System.out.println("}");
-        return null;
+        stringBuilder.setLength(stringBuilder.length()-1);
+        stringBuilder.append("}");
+        return stringBuilder.toString();
     }
 }
