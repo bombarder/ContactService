@@ -1,8 +1,15 @@
+import java.time.LocalDate;
 
 public class Customer {
 
     private String firstName;
-    private String secondName;
+    private String lastName;
+
+    @JsonValue(name ="fun")
+    private String hobby;
+
+    @CustomDateFormat(format = "dd-MM-yyyy")
+    private LocalDate birthDate;
 
     public String getFirstName() {
         return firstName;
@@ -12,11 +19,11 @@ public class Customer {
         this.firstName = firstName;
     }
 
-    public String getSecondName() {
-        return secondName;
+    public String getLastName() {
+        return lastName;
     }
 
-    public void setSecondName(String secondName) {
-        this.secondName = secondName;
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
     }
 }
