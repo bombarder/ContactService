@@ -22,9 +22,10 @@ public class Main {
             field.setAccessible(true);
             boolean annotationPresent = field.isAnnotationPresent(JsonValue.class);
             if (annotationPresent) {
-                field.set(object, field.getAnnotation(JsonValue.class).name());
+                stringBuilder.append("\"" + field.getAnnotation(JsonValue.class).name() +"\""+":"+ "\""+ field.get(object)+"\"," );
+            } else {
+                stringBuilder.append("\""+ field.getName() +"\""+":"+ "\""+ field.get(object)+"\",");
             }
-            stringBuilder.append("\""+ field.getName() +"\""+":"+ "\""+field.get(object)+"\",");
         }
         stringBuilder.setLength(stringBuilder.length()-1);
         stringBuilder.append("}");
