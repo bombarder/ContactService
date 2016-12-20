@@ -1,3 +1,4 @@
+import javax.annotation.PostConstruct;
 import java.time.LocalDate;
 
 public class Customer {
@@ -41,5 +42,20 @@ public class Customer {
 
     public void setBirthDate(LocalDate birthDate) {
         this.birthDate = birthDate;
+    }
+
+    @PostConstruct
+    public void init(){
+
+    }
+
+    @Override
+    public String toString() {
+        return "Customer{" +
+                "firstName='" + firstName + '\'' +
+                ", lastName='" + lastName + '\'' +
+                ", hobby='" + hobby + '\'' +
+                ", birthDate=" + birthDate +
+                '}';
     }
 }

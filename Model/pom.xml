@@ -15,6 +15,7 @@
 
     <properties>
         <hibernate.annotations>3.5.6-Final</hibernate.annotations>
+        <spring-context.version>4.3.4.RELEASE</spring-context.version>
     </properties>
 
     <dependencies>
@@ -27,6 +28,11 @@
             <groupId>org.springframework</groupId>
             <artifactId>spring-beans</artifactId>
             <version>${spring.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-context</artifactId>
+            <version>${spring-context.version}</version>
         </dependency>
     </dependencies>
 </project>
