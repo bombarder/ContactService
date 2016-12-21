@@ -1,8 +1,10 @@
 import java.lang.reflect.Field;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 
 public class Main {
@@ -18,7 +20,7 @@ public class Main {
         fromJson(s,Customer.class);
     }
 
-    private static <T> void fromJson(String json, Class<T> clazz) {
+    private static <T> void fromJson(String json, Class<T> clazz) throws Exception {
         Map<String, String> map = new HashMap<>();
         String rowJson = json.substring(1, json.length()-1);
         String[] dataFromJson = rowJson.split(",");
@@ -30,7 +32,18 @@ public class Main {
                 map.put(keyString, valueString);
             }
         }
-    }
+            for (Field field:clazz.getDeclaredFields()){
+                field.setAccessible(true);
+                String value = map.get(field.getName());
+                if (field.getType() == String.class){
+                    field.set(clazz.newInstance(), value);
+                } else {
+                    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
+                    formatter = formatter.withLocale(Locale.US );
+                    field.set(clazz.newInstance(), LocalDate.parse(value, formatter));
+                }
+            }
+        }
 
     public static String toJson(Object object) throws Exception {
         StringBuilder stringBuilder = new StringBuilder();
