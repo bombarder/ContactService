@@ -2,6 +2,8 @@ import java.lang.reflect.Field;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 public class Main {
     public static void main(String[] args) throws Exception {
@@ -13,6 +15,21 @@ public class Main {
 
         String s = toJson(customer);
         System.out.println(s);
+        fromJson(s,Customer.class);
+    }
+
+    private static <T> void fromJson(String json, Class<T> clazz) {
+        Map<String, String> map = new HashMap<>();
+        String rowJson = json.substring(1, json.length()-1);
+        String[] dataFromJson = rowJson.split(",");
+        for (String key:dataFromJson) {
+            String[]element = key.split(":");
+            for (int i = 0; i < element.length; i = i + 2) {
+                String keyString = element[i].substring(1, element[i].length() - 1);
+                String valueString = element[i + 1].substring(1, element[i + 1].length() - 1);
+                map.put(keyString, valueString);
+            }
+        }
     }
 
     public static String toJson(Object object) throws Exception {
@@ -43,7 +60,6 @@ public class Main {
                         + "\"" + ":" + "\"" + field.get(object) + "\",");
             }
         }
-
         stringBuilder.setLength(stringBuilder.length()-1);
         stringBuilder.append("}");
         return stringBuilder.toString();
