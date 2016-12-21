@@ -27,7 +27,9 @@ public class Main {
             boolean firstAnnotationPresent = field.isAnnotationPresent(JsonValue.class);
             boolean secondAnnotationPresent = field.isAnnotationPresent(CustomDateFormat.class);
 
-            if (firstAnnotationPresent) {
+            if (field.get(object) == null){
+                continue;
+            } else if (firstAnnotationPresent) {
                 stringBuilder.append("\"" + field.getAnnotation(JsonValue.class).name()
                         + "\"" + ":" + "\"" + field.get(object) + "\",");
             } else if (secondAnnotationPresent){
