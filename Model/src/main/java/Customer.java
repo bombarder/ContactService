@@ -43,7 +43,6 @@ public class Customer {
     public void setBirthDate(LocalDate birthDate) {
         this.birthDate = birthDate;
     }
-
     @PostConstruct
     public void init(){
 

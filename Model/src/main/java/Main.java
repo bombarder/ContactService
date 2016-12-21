@@ -1,10 +1,8 @@
 import java.lang.reflect.Field;
-import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.Date;
+import java.time.temporal.TemporalAccessor;
 import java.util.HashMap;
-import java.util.Locale;
 import java.util.Map;
 
 public class Main {
@@ -17,33 +15,53 @@ public class Main {
 
         String s = toJson(customer);
         System.out.println(s);
-        fromJson(s,Customer.class);
+
+        //language=JSON
+        String message = "{\n" +
+                "\"firstName\": \"Vova\",\n" +
+                "\"lastName\": \"Stepanov\",\n" +
+                "\"hobby\": \"polo\",\n" +
+                "\"birthDate\": \"28-04-1996\"\n" +
+                "}";
+        fromJson(message, Customer.class);
     }
 
     private static <T> void fromJson(String json, Class<T> clazz) throws Exception {
         Map<String, String> map = new HashMap<>();
-        String rowJson = json.substring(1, json.length()-1);
+        String rowJson = json.substring(1, json.length() - 1);
         String[] dataFromJson = rowJson.split(",");
-        for (String key:dataFromJson) {
-            String[]element = key.split(":");
-            for (int i = 0; i < element.length; i = i + 2) {
-                String keyString = element[i].substring(1, element[i].length() - 1);
-                String valueString = element[i + 1].substring(1, element[i + 1].length() - 1);
-                map.put(keyString, valueString);
+        for (String key : dataFromJson) {
+            String[] split = key.split(":");
+            map.put(trimString(split[0]), trimString(split[1]));
+        }
+        for (Field field : clazz.getDeclaredFields()) {
+            field.setAccessible(true);
+            String name = field.getName();
+            String value = map.get(name);
+            if (field.getType() == String.class) {
+                field.set(clazz.newInstance(), value);
+            } else {
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
+                //formatter = formatter.withLocale(Locale.US);
+                LocalDate parse = LocalDate.parse(value, formatter);
+                field.set(clazz.newInstance(), parse);
             }
         }
-            for (Field field:clazz.getDeclaredFields()){
-                field.setAccessible(true);
-                String value = map.get(field.getName());
-                if (field.getType() == String.class){
-                    field.set(clazz.newInstance(), value);
-                } else {
-                    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
-                    formatter = formatter.withLocale(Locale.US );
-                    field.set(clazz.newInstance(), LocalDate.parse(value, formatter));
-                }
-            }
+    }
+
+    private static String trimString(String string) {
+        String result = string.trim();
+        result = result.substring(1, result.length() - 1);
+        return result;
+    }
+
+    private static void firstLastSymbolRemove(Map<String, String> map, String[] element, int i) {
+        for (int j = 0; j < element.length; j++) {
+            String keyString = element[i].replaceAll("[^\\w\\s]", "");
+            String valueString = element[i + 1].replaceAll("[^\\w\\s]", "");
+            map.put(keyString, valueString);
         }
+    }
 
     public static String toJson(Object object) throws Exception {
         StringBuilder stringBuilder = new StringBuilder();
@@ -52,28 +70,29 @@ public class Main {
         Field[] fields = aClass.getDeclaredFields();
         stringBuilder.append("{");
 
-        for (Field field: fields) {
+        for (Field field : fields) {
             field.setAccessible(true);
             boolean firstAnnotationPresent = field.isAnnotationPresent(JsonValue.class);
             boolean secondAnnotationPresent = field.isAnnotationPresent(CustomDateFormat.class);
 
-            if (field.get(object) == null){
+            if (field.get(object) == null) {
                 continue;
             } else if (firstAnnotationPresent) {
                 stringBuilder.append("\"" + field.getAnnotation(JsonValue.class).name()
                         + "\"" + ":" + "\"" + field.get(object) + "\",");
-            } else if (secondAnnotationPresent){
-                SimpleDateFormat sdf = new SimpleDateFormat(field.getAnnotation(CustomDateFormat.class).format());
-                Date c = sdf.parse(field.get(object).toString());
-                String date = sdf.format(c);
+            } else if (secondAnnotationPresent) {
+                String pattern = field.getAnnotation(CustomDateFormat.class).format();
+                DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern(pattern);
+                String dateAsString = dateTimeFormatter.format((TemporalAccessor) field.get(object));
+
                 stringBuilder.append("\"" + field.getName()
-                        + "\"" + ":" + "\"" + date + "\",");
+                        + "\"" + ":" + "\"" + dateAsString + "\",");
             } else {
                 stringBuilder.append("\"" + field.getName()
                         + "\"" + ":" + "\"" + field.get(object) + "\",");
             }
         }
-        stringBuilder.setLength(stringBuilder.length()-1);
+        stringBuilder.setLength(stringBuilder.length() - 1);
         stringBuilder.append("}");
         return stringBuilder.toString();
     }
