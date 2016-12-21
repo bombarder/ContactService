@@ -42,7 +42,6 @@ public class Main {
                 field.set(clazz.newInstance(), value);
             } else {
                 DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
-                //formatter = formatter.withLocale(Locale.US);
                 LocalDate parse = LocalDate.parse(value, formatter);
                 field.set(clazz.newInstance(), parse);
             }
@@ -53,14 +52,6 @@ public class Main {
         String result = string.trim();
         result = result.substring(1, result.length() - 1);
         return result;
-    }
-
-    private static void firstLastSymbolRemove(Map<String, String> map, String[] element, int i) {
-        for (int j = 0; j < element.length; j++) {
-            String keyString = element[i].replaceAll("[^\\w\\s]", "");
-            String valueString = element[i + 1].replaceAll("[^\\w\\s]", "");
-            map.put(keyString, valueString);
-        }
     }
 
     public static String toJson(Object object) throws Exception {
