@@ -34,8 +34,8 @@ public class Main {
                 SimpleDateFormat sdf = new SimpleDateFormat(field.getAnnotation(CustomDateFormat.class).format());
                 Date c = sdf.parse(field.get(object).toString());
                 String date = sdf.format(c);
-                stringBuilder.append("\"" + date
-                        + "\"" + ":" + "\"" + field.get(object) + "\",");
+                stringBuilder.append("\"" + field.getName()
+                        + "\"" + ":" + "\"" + date + "\",");
             } else {
                 stringBuilder.append("\"" + field.getName()
                         + "\"" + ":" + "\"" + field.get(object) + "\",");
