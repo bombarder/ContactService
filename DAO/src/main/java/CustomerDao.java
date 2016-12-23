@@ -1,3 +1,4 @@
+import entity.Customer;
 
 public class CustomerDao {
 

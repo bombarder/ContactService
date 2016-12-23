@@ -1,3 +1,8 @@
+package entity;
+
+import annotations.CustomDateFormat;
+import annotations.JsonValue;
+
 import javax.annotation.PostConstruct;
 import java.time.LocalDate;
 
@@ -50,7 +55,7 @@ public class Customer {
 
     @Override
     public String toString() {
-        return "Customer{" +
+        return "entity.Customer{" +
                 "firstName='" + firstName + '\'' +
                 ", lastName='" + lastName + '\'' +
                 ", hobby='" + hobby + '\'' +

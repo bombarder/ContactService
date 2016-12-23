@@ -1,3 +1,8 @@
+package parserService;
+
+import annotations.CustomDateFormat;
+import annotations.JsonValue;
+
 import java.lang.reflect.Field;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -40,7 +45,7 @@ public class JsonParser {
         return stringBuilder.toString();
     }
 
-    static <T> void fromJson(String json, Class<T> clazz) throws Exception {
+    public static <T> void fromJson(String json, Class<T> clazz) throws Exception {
         Map<String, String> map = new HashMap<>();
         String rowJson = json.substring(1, json.length() - 1);
         String[] dataFromJson = rowJson.split(",");
