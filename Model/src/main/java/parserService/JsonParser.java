@@ -29,22 +29,22 @@ public class JsonParser {
                 Annotation[] annotations = field.getDeclaredAnnotations();
                 if (annotations.length > 0){
                     for (Annotation annotation:annotations) {
-                        if (annotation.annotationType().equals(JsonValue.class)) {
+                        boolean jsonAnnotation = annotation.annotationType().equals(JsonValue.class);
+                        boolean customDateFormatAnnotation = annotation.annotationType().equals(CustomDateFormat.class);
+                        if (jsonAnnotation) {
                             stringBuilder.append("\"" + field.getAnnotation(JsonValue.class).name()
                                     + "\"" + ":" + "\"" + field.get(object) + "\",");
-                        } else if (annotation.annotationType().equals(CustomDateFormat.class)) {
-                            String pattern = field.getAnnotation(CustomDateFormat.class).format();
-                            DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern(pattern);
-                            String dateAsString = dateTimeFormatter.format((TemporalAccessor) field.get(object));
-
-                            stringBuilder.append("\"" + field.getName()
-                                    + "\"" + ":" + "\"" + dateAsString + "\",");
+                        } else {
+                            if (customDateFormatAnnotation) {
+                                String pattern = field.getAnnotation(CustomDateFormat.class).format();
+                                DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern(pattern);
+                                String dateAsString = dateTimeFormatter.format((TemporalAccessor) field.get(object));
+                                stringBuilder.append("\"" + field.getName() + "\"" + ":" + "\"" + dateAsString + "\",");
+                            }
                         }
                     }
-
                 } else {
-                    stringBuilder.append("\"" + field.getName()
-                            + "\"" + ":" + "\"" + field.get(object) + "\",");
+                    stringBuilder.append("\"" + field.getName() + "\"" + ":" + "\"" + field.get(object) + "\",");
                 }
             }
         }
@@ -65,8 +65,12 @@ public class JsonParser {
             field.setAccessible(true);
             String name = field.getName();
             String value = map.get(name);
-            if (field.getType() == String.class) {
+            Class<?> fieldType = field.getType();
+            if (fieldType == String.class) {
                 field.set(clazz.newInstance(), value);
+            } else if (fieldType == Integer.class){
+                int integerValue = Integer.parseInt(value);
+                field.set(clazz.newInstance(), integerValue);
             } else {
                 DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
                 LocalDate parse = LocalDate.parse(value, formatter);
