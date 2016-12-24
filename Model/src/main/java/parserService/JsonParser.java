@@ -3,6 +3,7 @@ package parserService;
 import annotations.CustomDateFormat;
 import annotations.JsonValue;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -11,33 +12,40 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class JsonParser {
+
     public static String toJson(Object object) throws Exception {
         StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append("{");
 
         Class<?> aClass = object.getClass();
         Field[] fields = aClass.getDeclaredFields();
-        stringBuilder.append("{");
 
         for (Field field : fields) {
             field.setAccessible(true);
-            boolean firstAnnotationPresent = field.isAnnotationPresent(JsonValue.class);
-            boolean secondAnnotationPresent = field.isAnnotationPresent(CustomDateFormat.class);
 
             if (field.get(object) == null) {
                 continue;
-            } else if (firstAnnotationPresent) {
-                stringBuilder.append("\"" + field.getAnnotation(JsonValue.class).name()
-                        + "\"" + ":" + "\"" + field.get(object) + "\",");
-            } else if (secondAnnotationPresent) {
-                String pattern = field.getAnnotation(CustomDateFormat.class).format();
-                DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern(pattern);
-                String dateAsString = dateTimeFormatter.format((TemporalAccessor) field.get(object));
-
-                stringBuilder.append("\"" + field.getName()
-                        + "\"" + ":" + "\"" + dateAsString + "\",");
             } else {
-                stringBuilder.append("\"" + field.getName()
-                        + "\"" + ":" + "\"" + field.get(object) + "\",");
+                Annotation[] annotations = field.getDeclaredAnnotations();
+                if (annotations.length > 0){
+                    for (Annotation annotation:annotations) {
+                        if (annotation.annotationType().equals(JsonValue.class)) {
+                            stringBuilder.append("\"" + field.getAnnotation(JsonValue.class).name()
+                                    + "\"" + ":" + "\"" + field.get(object) + "\",");
+                        } else if (annotation.annotationType().equals(CustomDateFormat.class)) {
+                            String pattern = field.getAnnotation(CustomDateFormat.class).format();
+                            DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern(pattern);
+                            String dateAsString = dateTimeFormatter.format((TemporalAccessor) field.get(object));
+
+                            stringBuilder.append("\"" + field.getName()
+                                    + "\"" + ":" + "\"" + dateAsString + "\",");
+                        }
+                    }
+
+                } else {
+                    stringBuilder.append("\"" + field.getName()
+                            + "\"" + ":" + "\"" + field.get(object) + "\",");
+                }
             }
         }
         stringBuilder.setLength(stringBuilder.length() - 1);
