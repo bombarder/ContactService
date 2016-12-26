@@ -10,6 +10,7 @@ public class Main {
         customer.setFirstName("Ivan");
         customer.setHobby("hockey");
         customer.setBirthDate(LocalDate.of(2000, 9, 12));
+        customer.setAge(35);
 
         String s = JsonParser.toJson(customer);
         System.out.println(s);
@@ -19,7 +20,8 @@ public class Main {
                 "\"firstName\": \"Vova\",\n" +
                 "\"lastName\": \"Stepanov\",\n" +
                 "\"hobby\": \"polo\",\n" +
-                "\"birthDate\": \"28-04-1996\"\n" +
+                "\"birthDate\": \"28-04-1996\", \n" +
+                "  \"age\": \"30\"\n" +
                 "}";
         JsonParser.fromJson(message, Customer.class);
     }
