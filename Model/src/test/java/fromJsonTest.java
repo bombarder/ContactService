@@ -2,6 +2,8 @@ import entity.TestCustomer;
 import org.junit.Test;
 import parserService.JsonParser;
 
+import java.time.LocalDate;
+
 import static org.junit.Assert.assertEquals;
 
 public class fromJsonTest {
@@ -11,6 +13,14 @@ public class fromJsonTest {
 
         TestCustomer expectedCustomer = new TestCustomer();
         expectedCustomer.setAge(30);
+        expectedCustomer.setFirstName("John");
+        expectedCustomer.setHobby("golf");
+        expectedCustomer.setBirthDate(LocalDate.of(2017, 01, 01));
+        expectedCustomer.setByteNumber((byte) 2);
+        expectedCustomer.setShortNumber((short) 4);
+        expectedCustomer.setLongNumber(220);
+        expectedCustomer.setFloatNumber(1000f);
+        expectedCustomer.setDoubleNumber(2000);
 
         //language=JSON
         String testMessage = "{\n" +
