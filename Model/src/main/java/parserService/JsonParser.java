@@ -73,6 +73,13 @@ public class JsonParser {
                     fieldType.isAssignableFrom(short.class)||fieldType.isAssignableFrom(Short.class)){
                 int integerValue = Integer.parseInt(value);
                 field.set(clazz.newInstance(), integerValue);
+            } else if (fieldType.isAssignableFrom(long.class)||fieldType.isAssignableFrom(Long.class)){
+                long longValue = Long.parseLong(value);
+                field.set(clazz.newInstance(), longValue);
+            } else if (fieldType.isAssignableFrom(float.class)||fieldType.isAssignableFrom(Float.class)||
+                    fieldType.isAssignableFrom(double.class)||fieldType.isAssignableFrom(Double.class)){
+                double doubleValue = Double.parseDouble(value);
+                field.set(clazz.newInstance(), doubleValue);
             } else {
                 DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
                 LocalDate parse = LocalDate.parse(value, formatter);
