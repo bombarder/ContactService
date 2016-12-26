@@ -23,12 +23,10 @@ public class JsonParser {
         for (Field field : fields) {
             field.setAccessible(true);
 
-            if (field.get(object) == null) {
-                continue;
-            } else {
+            if (field.get(object) != null) {
                 Annotation[] annotations = field.getDeclaredAnnotations();
-                if (annotations.length > 0){
-                    for (Annotation annotation:annotations) {
+                if (annotations.length > 0) {
+                    for (Annotation annotation : annotations) {
                         boolean jsonAnnotation = annotation.annotationType().equals(JsonValue.class);
                         boolean customDateFormatAnnotation = annotation.annotationType().equals(CustomDateFormat.class);
                         if (jsonAnnotation) {
@@ -53,7 +51,7 @@ public class JsonParser {
         return stringBuilder.toString();
     }
 
-    public static <T> void fromJson(String json, Class<T> clazz) throws Exception {
+    public static <T> T fromJson(String json, Class<T> clazz) throws Exception {
         Map<String, String> map = new HashMap<>();
         String rowJson = json.substring(1, json.length() - 1);
         String[] dataFromJson = rowJson.split(",");
@@ -61,31 +59,38 @@ public class JsonParser {
             String[] split = key.split(":");
             map.put(trimString(split[0]), trimString(split[1]));
         }
+
+        T obj = clazz.newInstance();
+
         for (Field field : clazz.getDeclaredFields()) {
             field.setAccessible(true);
             String name = field.getName();
             String value = map.get(name);
-            Class<?> fieldType = field.getType();
-            if (fieldType.isAssignableFrom(String.class)) {
-                field.set(clazz.newInstance(), value);
-            } else if (fieldType.isAssignableFrom(int.class)||fieldType.isAssignableFrom(Integer.class)||
-                    fieldType.isAssignableFrom(byte.class)||fieldType.isAssignableFrom(Byte.class)||
-                    fieldType.isAssignableFrom(short.class)||fieldType.isAssignableFrom(Short.class)){
-                int integerValue = Integer.parseInt(value);
-                field.set(clazz.newInstance(), integerValue);
-            } else if (fieldType.isAssignableFrom(long.class)||fieldType.isAssignableFrom(Long.class)){
-                long longValue = Long.parseLong(value);
-                field.set(clazz.newInstance(), longValue);
-            } else if (fieldType.isAssignableFrom(float.class)||fieldType.isAssignableFrom(Float.class)||
-                    fieldType.isAssignableFrom(double.class)||fieldType.isAssignableFrom(Double.class)){
-                double doubleValue = Double.parseDouble(value);
-                field.set(clazz.newInstance(), doubleValue);
-            } else {
-                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
-                LocalDate parse = LocalDate.parse(value, formatter);
-                field.set(clazz.newInstance(), parse);
+
+            if (value != null) {
+                Class<?> fieldType = field.getType();
+                if (fieldType.isAssignableFrom(String.class)) {
+                    field.set(obj, value);
+                } else if (fieldType.isAssignableFrom(int.class) || fieldType.isAssignableFrom(Integer.class) ||
+                        fieldType.isAssignableFrom(byte.class) || fieldType.isAssignableFrom(Byte.class) ||
+                        fieldType.isAssignableFrom(short.class) || fieldType.isAssignableFrom(Short.class)) {
+                    int integerValue = Integer.parseInt(value);
+                    field.set(obj, integerValue);
+                } else if (fieldType.isAssignableFrom(long.class) || fieldType.isAssignableFrom(Long.class)) {
+                    long longValue = Long.parseLong(value);
+                    field.set(obj, longValue);
+                } else if (fieldType.isAssignableFrom(float.class) || fieldType.isAssignableFrom(Float.class) ||
+                        fieldType.isAssignableFrom(double.class) || fieldType.isAssignableFrom(Double.class)) {
+                    double doubleValue = Double.parseDouble(value);
+                    field.set(obj, doubleValue);
+                } else {
+                    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy"); // TODO: 26.12.2016 fix
+                    LocalDate parse = LocalDate.parse(value, formatter);
+                    field.set(obj, parse);
+                }
             }
         }
+        return obj;
     }
 
     private static String trimString(String string) {
