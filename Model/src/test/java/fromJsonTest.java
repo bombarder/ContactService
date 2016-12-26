@@ -1,4 +1,4 @@
-import entity.Customer;
+import entity.TestCustomer;
 import org.junit.Test;
 import parserService.JsonParser;
 
@@ -9,7 +9,7 @@ public class fromJsonTest {
     @Test
     public void byteFieldTest() throws Exception {
 
-        Customer expectedCustomer = new Customer();
+        TestCustomer expectedCustomer = new TestCustomer();
         expectedCustomer.setAge(30);
 
         String byteMessage = "{\n" +
@@ -17,7 +17,7 @@ public class fromJsonTest {
                 "}";
 
         JsonParser jsonParser = new JsonParser();
-        Customer customer = jsonParser.fromJson(byteMessage, Customer.class);
-        assertEquals(expectedCustomer ,customer);
+        TestCustomer testCustomer = jsonParser.fromJson(byteMessage, TestCustomer.class);
+        assertEquals(expectedCustomer ,testCustomer);
     }
 }
