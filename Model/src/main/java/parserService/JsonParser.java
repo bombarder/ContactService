@@ -68,7 +68,9 @@ public class JsonParser {
             Class<?> fieldType = field.getType();
             if (fieldType.isAssignableFrom(String.class)) {
                 field.set(clazz.newInstance(), value);
-            } else if (fieldType.isAssignableFrom(int.class)){
+            } else if (fieldType.isAssignableFrom(int.class)||fieldType.isAssignableFrom(Integer.class)||
+                    fieldType.isAssignableFrom(byte.class)||fieldType.isAssignableFrom(Byte.class)||
+                    fieldType.isAssignableFrom(short.class)||fieldType.isAssignableFrom(Short.class)){
                 int integerValue = Integer.parseInt(value);
                 field.set(clazz.newInstance(), integerValue);
             } else {
