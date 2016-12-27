@@ -2,7 +2,6 @@ package parserService;
 
 import annotations.CustomDateFormat;
 import annotations.JsonValue;
-import entity.Address;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
@@ -85,17 +84,13 @@ public class JsonParser {
                 } else if (fieldType.isAssignableFrom(double.class) || fieldType.isAssignableFrom(Double.class)) {
                     double doubleValue = Double.parseDouble(value);
                     field.set(obj, doubleValue);
-                } else if (fieldType.isAssignableFrom(Address.class)){
-                    for (String key : map.keySet()){
-                        if (objectFieldName.equals(key)){
-                            field.set(obj, map.get(key));
-                        }
-                    }
-                }else{
+                } else if (fieldType.isAssignableFrom(LocalDate.class)) {
                     String pattern = field.getAnnotation(CustomDateFormat.class).format();
                     DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern(pattern);
                     LocalDate parse = LocalDate.parse(value, dateTimeFormatter);
                     field.set(obj, parse);
+                } else {
+                    field.set(obj, fromJson(value, fieldType));
                 }
             }
         }
@@ -104,13 +99,30 @@ public class JsonParser {
 
     private static Map<String, String> jsonToMapConverter(String json) {
         Map<String, String> map = new HashMap<>();
-        String rowJson = json.substring(1, json.length() - 1);
-        String[] dataFromJson = rowJson.split(",");
+        String jsonWithoutBrackets = json.substring(1, json.length() - 1);
+
+        if (json.contains("{")){
+            String objectString = inputJsonInternalBracketsChecking(jsonWithoutBrackets);
+            String[] dataFromJson = objectString.split(",");
+            for (String key : dataFromJson) {
+                String[] split = key.split(":");
+                map.put(trimString(split[0]), trimString(split[1]));
+            }
+        }
+
+        String[] dataFromJson = jsonWithoutBrackets.split(",");
         for (String key : dataFromJson) {
             String[] split = key.split(":");
             map.put(trimString(split[0]), trimString(split[1]));
         }
         return map;
+    }
+
+    private static String inputJsonInternalBracketsChecking(String rowJson) {
+        int startBracketIndex = rowJson.indexOf('{');
+        int closeBracketIndex = rowJson.indexOf('}');
+        String targetString = rowJson.substring(startBracketIndex,closeBracketIndex);
+        return targetString;
     }
 
     private static String trimString(String string) {

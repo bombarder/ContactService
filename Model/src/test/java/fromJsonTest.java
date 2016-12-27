@@ -25,7 +25,7 @@ public class fromJsonTest {
         expectedCustomer.setByteNumber((byte) 2);
         expectedCustomer.setShortNumber((short) 4);
         expectedCustomer.setLongNumber(220);
-        expectedCustomer.setFloatNumber(1000f);
+        expectedCustomer.setFloatNumber(1000.9f);
         expectedCustomer.setDoubleNumber(2000);
         expectedCustomer.setAddress(testAddress);
 
