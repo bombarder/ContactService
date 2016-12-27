@@ -71,27 +71,28 @@ public class JsonParser {
                 Class<?> fieldType = field.getType();
                 if (fieldType.isAssignableFrom(String.class)) {
                     field.set(obj, value);
-                } else if (fieldType.isAssignableFrom(int.class) || fieldType.isAssignableFrom(Integer.class)){
+                } else if (fieldType.isAssignableFrom(int.class) || fieldType.isAssignableFrom(Integer.class)) {
                     int integerValue = Integer.parseInt(value);
                     field.set(obj, integerValue);
-                } else if (fieldType.isAssignableFrom(byte.class) || fieldType.isAssignableFrom(Byte.class)){
+                } else if (fieldType.isAssignableFrom(byte.class) || fieldType.isAssignableFrom(Byte.class)) {
                     byte byteValue = Byte.parseByte(value);
                     field.set(obj, byteValue);
-                } else if (fieldType.isAssignableFrom(short.class) || fieldType.isAssignableFrom(Short.class)){
+                } else if (fieldType.isAssignableFrom(short.class) || fieldType.isAssignableFrom(Short.class)) {
                     short shortValue = Short.parseShort(value);
                     field.set(obj, shortValue);
                 } else if (fieldType.isAssignableFrom(long.class) || fieldType.isAssignableFrom(Long.class)) {
                     long longValue = Long.parseLong(value);
                     field.set(obj, longValue);
-                } else if (fieldType.isAssignableFrom(float.class) || fieldType.isAssignableFrom(Float.class)){
+                } else if (fieldType.isAssignableFrom(float.class) || fieldType.isAssignableFrom(Float.class)) {
                     float floatValue = Float.parseFloat(value);
                     field.set(obj, floatValue);
-                } else if (fieldType.isAssignableFrom(double.class) || fieldType.isAssignableFrom(Double.class)){
+                } else if (fieldType.isAssignableFrom(double.class) || fieldType.isAssignableFrom(Double.class)) {
                     double doubleValue = Double.parseDouble(value);
                     field.set(obj, doubleValue);
                 } else {
-                    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy"); // TODO: 26.12.2016 fix
-                    LocalDate parse = LocalDate.parse(value, formatter);
+                    String pattern = field.getAnnotation(CustomDateFormat.class).format();
+                    DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern(pattern);
+                    LocalDate parse = LocalDate.parse(value, dateTimeFormatter);
                     field.set(obj, parse);
                 }
             }
