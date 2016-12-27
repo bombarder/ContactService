@@ -1,3 +1,4 @@
+import entity.Address;
 import entity.TestCustomer;
 import org.junit.Test;
 import parserService.JsonParser;
@@ -11,6 +12,11 @@ public class fromJsonTest {
     @Test
     public void byteFieldTest() throws Exception {
 
+        Address testAddress = new Address();
+        testAddress.setHouseNumber(1514);
+        testAddress.setStreet("West 11th str.");
+        testAddress.setZipCode(11204);
+
         TestCustomer expectedCustomer = new TestCustomer();
         expectedCustomer.setAge(30);
         expectedCustomer.setFirstName("John");
@@ -21,6 +27,7 @@ public class fromJsonTest {
         expectedCustomer.setLongNumber(220);
         expectedCustomer.setFloatNumber(1000f);
         expectedCustomer.setDoubleNumber(2000);
+        expectedCustomer.setAddress(testAddress);
 
         //language=JSON
         String testMessage = "{\n" +
@@ -32,7 +39,12 @@ public class fromJsonTest {
                 "\"shortNumber\": \"4\",\n" +
                 "\"longNumber\": \"220\",\n" +
                 "\"floatNumber\":\"1000f\",\n" +
-                "\"doubleNumber\":\"2000d\"\n" +
+                "\"doubleNumber\":\"2000d\",\n" +
+                "  \"address\": {\n" +
+                "    \"houseNumber\":\"1514\",\n" +
+                "    \"street\":\"west 11th str.\",\n" +
+                "    \"zipCode\":\"11204\"\n" +
+                "  }\n" +
                 "}";
 
         JsonParser jsonParser = new JsonParser();

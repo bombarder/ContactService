@@ -2,6 +2,7 @@ package parserService;
 
 import annotations.CustomDateFormat;
 import annotations.JsonValue;
+import entity.Address;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
@@ -52,20 +53,15 @@ public class JsonParser {
     }
 
     public static <T> T fromJson(String json, Class<T> clazz) throws Exception {
-        Map<String, String> map = new HashMap<>();
-        String rowJson = json.substring(1, json.length() - 1);
-        String[] dataFromJson = rowJson.split(",");
-        for (String key : dataFromJson) {
-            String[] split = key.split(":");
-            map.put(trimString(split[0]), trimString(split[1]));
-        }
+
+        Map<String, String> map = jsonToMapConverter(json);
 
         T obj = clazz.newInstance();
 
         for (Field field : clazz.getDeclaredFields()) {
             field.setAccessible(true);
-            String name = field.getName();
-            String value = map.get(name);
+            String objectFieldName = field.getName();
+            String value = map.get(objectFieldName);
 
             if (value != null) {
                 Class<?> fieldType = field.getType();
@@ -89,7 +85,13 @@ public class JsonParser {
                 } else if (fieldType.isAssignableFrom(double.class) || fieldType.isAssignableFrom(Double.class)) {
                     double doubleValue = Double.parseDouble(value);
                     field.set(obj, doubleValue);
-                } else {
+                } else if (fieldType.isAssignableFrom(Address.class)){
+                    for (String key : map.keySet()){
+                        if (objectFieldName.equals(key)){
+                            field.set(obj, map.get(key));
+                        }
+                    }
+                }else{
                     String pattern = field.getAnnotation(CustomDateFormat.class).format();
                     DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern(pattern);
                     LocalDate parse = LocalDate.parse(value, dateTimeFormatter);
@@ -98,6 +100,17 @@ public class JsonParser {
             }
         }
         return obj;
+    }
+
+    private static Map<String, String> jsonToMapConverter(String json) {
+        Map<String, String> map = new HashMap<>();
+        String rowJson = json.substring(1, json.length() - 1);
+        String[] dataFromJson = rowJson.split(",");
+        for (String key : dataFromJson) {
+            String[] split = key.split(":");
+            map.put(trimString(split[0]), trimString(split[1]));
+        }
+        return map;
     }
 
     private static String trimString(String string) {

@@ -19,6 +19,15 @@ public class TestCustomer {
     private long longNumber;
     private float floatNumber;
     private double doubleNumber;
+    private Address address;
+
+    public Address getAddress() {
+        return address;
+    }
+
+    public void setAddress(Address address) {
+        this.address = address;
+    }
 
     public String getFirstName() {
         return firstName;
@@ -107,7 +116,8 @@ public class TestCustomer {
         if (Double.compare(that.doubleNumber, doubleNumber) != 0) return false;
         if (firstName != null ? !firstName.equals(that.firstName) : that.firstName != null) return false;
         if (hobby != null ? !hobby.equals(that.hobby) : that.hobby != null) return false;
-        return birthDate != null ? birthDate.equals(that.birthDate) : that.birthDate == null;
+        if (birthDate != null ? !birthDate.equals(that.birthDate) : that.birthDate != null) return false;
+        return address != null ? address.equals(that.address) : that.address == null;
     }
 
     @Override
@@ -124,6 +134,7 @@ public class TestCustomer {
         result = 31 * result + (floatNumber != +0.0f ? Float.floatToIntBits(floatNumber) : 0);
         temp = Double.doubleToLongBits(doubleNumber);
         result = 31 * result + (int) (temp ^ (temp >>> 32));
+        result = 31 * result + (address != null ? address.hashCode() : 0);
         return result;
     }
 
@@ -139,6 +150,7 @@ public class TestCustomer {
                 ", longNumber=" + longNumber +
                 ", floatNumber=" + floatNumber +
                 ", doubleNumber=" + doubleNumber +
+                ", address=" + address +
                 '}';
     }
 }
