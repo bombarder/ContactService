@@ -13,11 +13,11 @@ public class TestCustomer {
     @JsonValue(name ="funDay")
     @CustomDateFormat(format = "dd-MM-yyyy")
     private LocalDate birthDate;
-    private int byteNumber;
-    private int shortNumber;
+    private byte byteNumber;
+    private short shortNumber;
     private int age;
     private long longNumber;
-    private double floatNumber;
+    private float floatNumber;
     private double doubleNumber;
 
     public String getFirstName() {
@@ -44,7 +44,7 @@ public class TestCustomer {
         this.birthDate = birthDate;
     }
 
-    public int getByteNumber() {
+    public byte getByteNumber() {
         return byteNumber;
     }
 
@@ -52,7 +52,7 @@ public class TestCustomer {
         this.byteNumber = byteNumber;
     }
 
-    public int getShortNumber() {
+    public short getShortNumber() {
         return shortNumber;
     }
 
@@ -76,7 +76,7 @@ public class TestCustomer {
         this.longNumber = longNumber;
     }
 
-    public double getFloatNumber() {
+    public float getFloatNumber() {
         return floatNumber;
     }
 
@@ -103,7 +103,7 @@ public class TestCustomer {
         if (shortNumber != that.shortNumber) return false;
         if (age != that.age) return false;
         if (longNumber != that.longNumber) return false;
-        if (Double.compare(that.floatNumber, floatNumber) != 0) return false;
+        if (Float.compare(that.floatNumber, floatNumber) != 0) return false;
         if (Double.compare(that.doubleNumber, doubleNumber) != 0) return false;
         if (firstName != null ? !firstName.equals(that.firstName) : that.firstName != null) return false;
         if (hobby != null ? !hobby.equals(that.hobby) : that.hobby != null) return false;
@@ -117,12 +117,11 @@ public class TestCustomer {
         result = firstName != null ? firstName.hashCode() : 0;
         result = 31 * result + (hobby != null ? hobby.hashCode() : 0);
         result = 31 * result + (birthDate != null ? birthDate.hashCode() : 0);
-        result = 31 * result + byteNumber;
-        result = 31 * result + shortNumber;
+        result = 31 * result + (int) byteNumber;
+        result = 31 * result + (int) shortNumber;
         result = 31 * result + age;
         result = 31 * result + (int) (longNumber ^ (longNumber >>> 32));
-        temp = Double.doubleToLongBits(floatNumber);
-        result = 31 * result + (int) (temp ^ (temp >>> 32));
+        result = 31 * result + (floatNumber != +0.0f ? Float.floatToIntBits(floatNumber) : 0);
         temp = Double.doubleToLongBits(doubleNumber);
         result = 31 * result + (int) (temp ^ (temp >>> 32));
         return result;
