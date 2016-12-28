@@ -53,7 +53,7 @@ public class JsonParser {
 
     public static <T> T fromJson(String json, Class<T> clazz) throws Exception {
 
-        Map<String, String> map = new HashMap<>();
+        Map<String, Object> map = new HashMap<>();
         jsonToMapConverter(json, (HashMap) map);
 
         T obj = clazz.newInstance();
@@ -61,7 +61,7 @@ public class JsonParser {
         for (Field field : clazz.getDeclaredFields()) {
             field.setAccessible(true);
             String objectFieldName = field.getName();
-            String value = map.get(objectFieldName);
+            String value = (String) map.get(objectFieldName);
 
             if (value != null) {
                 Class<?> fieldType = field.getType();
@@ -100,66 +100,18 @@ public class JsonParser {
 
     private static String jsonToMapConverter(String json, HashMap map) {
 
-        if (json.startsWith("{")&&json.endsWith("}")){
-            return jsonToMapConverter(json.substring(1, json.length()-1), map);
-        } else {
-            int keyPos = 0;
-            while (keyPos < json.length() - 1){
-                if (!isColon(json.charAt(keyPos)) && !isComa(json.charAt(keyPos))){
-                    keyPos++;
-                } else {
-                    String key = json.substring(1, keyPos - 1);
-                    String value = jsonToMapConverter(json.substring(keyPos + 1), map);
-                    map.put(key,value);
-                }
-            }
+        String[] dataFromJson = json.split(",");
+        for (String key : dataFromJson) {
+            String[] split = key.split(":");
+            map.put(trimString(split[0]), trimString(split[1]));
         }
-
-//        String jsonWithoutBrackets = json.substring(1, json.length() - 1);
-//
-//        if (json.contains("{")){
-//            String objectString = inputJsonInternalBracketsChecking(jsonWithoutBrackets);
-//            String[] dataFromJson = objectString.split(",");
-//            for (String key : dataFromJson) {
-//                String[] split = key.split(":");
-//                map.put(trimString(split[0]), trimString(split[1]));
-//            }
-//        }
-//
-//        String[] dataFromJson = jsonWithoutBrackets.split(",");
-//        for (String key : dataFromJson) {
-//            String[] split = key.split(":");
-//            map.put(trimString(split[0]), trimString(split[1]));
-//        }
-        return json;
+       return null;
     }
 
-    private static boolean isComa(char c) {
-        if (c == ','){
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-    private static boolean isColon(char c) {
-        if (c == ':'){
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-    private static String inputJsonInternalBracketsChecking(String rowJson) {
-        int startBracketIndex = rowJson.indexOf('{');
-        int closeBracketIndex = rowJson.indexOf('}');
-        String targetString = rowJson.substring(startBracketIndex,closeBracketIndex);
-        return targetString;
-    }
-
-    private static String trimString(String string) {
+    private static String trimString (String string){
         String result = string.trim();
         result = result.substring(1, result.length() - 1);
         return result;
     }
 }
+
