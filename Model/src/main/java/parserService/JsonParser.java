@@ -9,7 +9,6 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.TemporalAccessor;
 import java.util.HashMap;
-import java.util.Map;
 
 public class JsonParser {
 
@@ -53,10 +52,9 @@ public class JsonParser {
 
     public static <T> T fromJson(String json, Class<T> clazz) throws Exception {
 
-        Map<String, Object> map = new HashMap<>();
-        jsonToMapConverter(json, (HashMap) map);
+        HashMap map = jsonToMapConverter(json);
 
-        T obj = clazz.newInstance();
+        T externalClassInstance = clazz.newInstance();
 
         for (Field field : clazz.getDeclaredFields()) {
             field.setAccessible(true);
@@ -66,52 +64,84 @@ public class JsonParser {
             if (value != null) {
                 Class<?> fieldType = field.getType();
                 if (fieldType.isAssignableFrom(String.class)) {
-                    field.set(obj, value);
+                    field.set(externalClassInstance, value);
                 } else if (fieldType.isAssignableFrom(int.class) || fieldType.isAssignableFrom(Integer.class)) {
                     int integerValue = Integer.parseInt(value);
-                    field.set(obj, integerValue);
+                    field.set(externalClassInstance, integerValue);
                 } else if (fieldType.isAssignableFrom(byte.class) || fieldType.isAssignableFrom(Byte.class)) {
                     byte byteValue = Byte.parseByte(value);
-                    field.set(obj, byteValue);
+                    field.set(externalClassInstance, byteValue);
                 } else if (fieldType.isAssignableFrom(short.class) || fieldType.isAssignableFrom(Short.class)) {
                     short shortValue = Short.parseShort(value);
-                    field.set(obj, shortValue);
+                    field.set(externalClassInstance, shortValue);
                 } else if (fieldType.isAssignableFrom(long.class) || fieldType.isAssignableFrom(Long.class)) {
                     long longValue = Long.parseLong(value);
-                    field.set(obj, longValue);
+                    field.set(externalClassInstance, longValue);
                 } else if (fieldType.isAssignableFrom(float.class) || fieldType.isAssignableFrom(Float.class)) {
                     float floatValue = Float.parseFloat(value);
-                    field.set(obj, floatValue);
+                    field.set(externalClassInstance, floatValue);
                 } else if (fieldType.isAssignableFrom(double.class) || fieldType.isAssignableFrom(Double.class)) {
                     double doubleValue = Double.parseDouble(value);
-                    field.set(obj, doubleValue);
+                    field.set(externalClassInstance, doubleValue);
                 } else if (fieldType.isAssignableFrom(LocalDate.class)) {
                     String pattern = field.getAnnotation(CustomDateFormat.class).format();
                     DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern(pattern);
                     LocalDate parse = LocalDate.parse(value, dateTimeFormatter);
-                    field.set(obj, parse);
+                    field.set(externalClassInstance, parse);
                 } else {
-                    field.set(obj, fromJson(value, fieldType));
+                    field.set(externalClassInstance, fromJson(value, fieldType));
                 }
             }
         }
-        return obj;
+        return externalClassInstance;
     }
 
-    private static String jsonToMapConverter(String json, HashMap map) {
+    private static HashMap jsonToMapConverter(String json) {
 
-        String[] dataFromJson = json.split(",");
-        for (String key : dataFromJson) {
-            String[] split = key.split(":");
-            map.put(trimString(split[0]), trimString(split[1]));
+        HashMap<String, Object> map = new HashMap<>();
+
+        String key = "";
+        String value = "";
+        boolean inKey = false;
+        boolean inValue = false;
+        int counter = 0;
+
+        while (true){
+            if (json.charAt(counter) == '{'){
+                counter++;
+                if (json.charAt(counter) == '\"'){
+                    inKey = true;
+                    counter++;
+                }
+                if (json.charAt(counter) == '}'){
+                    if (json.charAt(counter) == '\"'){
+                        inKey = false;
+                        counter++;
+                    }
+                }
+            } else {
+                if (json.charAt(counter) == ':'){
+                    counter ++;
+                    if (json.charAt(counter) =='{'){
+                        inValue = true;
+                        counter ++;
+                    } if (json.charAt(counter) =='}'){
+                        inValue = false;
+                        break;
+                    }
+                }
+            }
+
+            if (inKey){
+                key += json.charAt(counter);
+            }
+            if (inValue){
+                value += json.charAt(counter);
+            }
         }
-       return null;
-    }
 
-    private static String trimString (String string){
-        String result = string.trim();
-        result = result.substring(1, result.length() - 1);
-        return result;
+        map.put(key,value);
+        return map;
     }
 }
 
