@@ -106,40 +106,39 @@ public class JsonParser {
         boolean inValue = false;
         int counter = 0;
 
-        while (true){
-            if (json.charAt(counter) == '{'){
+        while (!(json.charAt(counter) == '}')){
+            if (json.charAt(counter) == '{') {
                 counter++;
-                if (json.charAt(counter) == '\"'){
+                if (json.charAt(counter) == '\"') {
                     inKey = true;
                     counter++;
                 }
-                if (json.charAt(counter) == '}'){
+            }
+            while (inKey){
+                key += json.charAt(counter);
                     if (json.charAt(counter) == '\"'){
                         inKey = false;
-                        counter++;
                     }
-                }
+                    counter++;
+            }
+            if (!(json.charAt(counter) == ':')){
+                counter ++;
             } else {
-                if (json.charAt(counter) == ':'){
+                counter++;
+                if (json.charAt(counter) =='\"'){
+                    inValue = true;
                     counter ++;
-                    if (json.charAt(counter) =='{'){
-                        inValue = true;
-                        counter ++;
-                    } if (json.charAt(counter) =='}'){
-                        inValue = false;
-                        break;
-                    }
                 }
             }
-
-            if (inKey){
-                key += json.charAt(counter);
-            }
-            if (inValue){
+            while (inValue){
                 value += json.charAt(counter);
+                    if (json.charAt(counter) =='}'){
+                        counter++;
+                        inValue = false;
+                    }
+                counter++;
             }
         }
-
         map.put(key,value);
         return map;
     }
