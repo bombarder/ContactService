@@ -2,6 +2,7 @@ package parserService;
 
 import annotations.CustomDateFormat;
 import annotations.JsonValue;
+import org.apache.commons.lang3.mutable.MutableInt;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
@@ -104,39 +105,38 @@ public class JsonParser {
         String value = "";
         boolean inKey = false;
         boolean inValue = false;
-        int counter = 0;
 
-        while (!(json.charAt(counter) == '}')){
-            if (json.charAt(counter) == '{') {
-                counter++;
-                if (json.charAt(counter) == '\"') {
-                    inKey = true;
-                    counter++;
-                }
-            }
-            while (inKey){
-                key += json.charAt(counter);
-                    if (json.charAt(counter) == '\"'){
-                        inKey = false;
+        MutableInt counter = new MutableInt();
+
+        while (counter.getValue() < json.length()) {
+            if (json.charAt(counter.getValue()) == '{') {
+                counter.increment();
+            } else if (json.charAt(counter.getValue()) == ':') {
+                counter.increment();
+                if (json.charAt(counter.getValue()) == '\"') {
+                    inValue = !inValue;
+                    counter.increment();
+                    while (inValue) {
+                        value += json.charAt(counter.getValue());
+                        counter.increment();
+                        if (json.charAt(counter.getValue()) == '\"') {
+                            break;
+                        }
                     }
-                    counter++;
-            }
-            if (!(json.charAt(counter) == ':')){
-                counter ++;
+                }
+                counter.increment();
+            } else if (json.charAt(counter.getValue()) == '\"') {
+                inKey = !inKey;
+                counter.increment();
+                while (inKey) {
+                    key += json.charAt(counter.getValue());
+                    counter.increment();
+                    if (json.charAt(counter.getValue()) == '\"') {
+                        break;
+                    }
+                }
             } else {
-                counter++;
-                if (json.charAt(counter) =='\"'){
-                    inValue = true;
-                    counter ++;
-                }
-            }
-            while (inValue){
-                value += json.charAt(counter);
-                    if (json.charAt(counter) =='}'){
-                        counter++;
-                        inValue = false;
-                    }
-                counter++;
+                counter.increment();
             }
         }
         map.put(key,value);
