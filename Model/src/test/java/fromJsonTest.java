@@ -27,7 +27,7 @@ public class fromJsonTest {
         expectedCustomer.setLongNumber(220);
         expectedCustomer.setFloatNumber(1000.9f);
         expectedCustomer.setDoubleNumber(2000.078);
-//        expectedCustomer.setAddress(testAddress);
+        expectedCustomer.setAddress(testAddress);
 
         //language=JSON
         String testMessage = "{\n" +
@@ -39,7 +39,11 @@ public class fromJsonTest {
                 "\"shortNumber\": \"4\",\n" +
                 "\"longNumber\": \"220\",\n" +
                 "\"floatNumber\":\"1000.9\",\n" +
-                "\"doubleNumber\":\"2000.078\""+
+                "\"doubleNumber\":\"2000.078\",\n" +
+                "  \"address\":{\"houseNumber\":\"1514\",\n" +
+                "    \"street\":\"West 11th str.\",\n" +
+                "    \"zipCode\":\"11204\"\n" +
+                "  }\n" +
                 "}";
 
         JsonParser jsonParser = new JsonParser();

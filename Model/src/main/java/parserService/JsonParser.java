@@ -143,11 +143,9 @@ public class JsonParser {
                     key = "";
                     value = "";
                 }
-
             } else if (state == COMMA_WAITING && character == ',') {
                 state = KEY_WAITING;
             }
-
         }
         return map;
     }
