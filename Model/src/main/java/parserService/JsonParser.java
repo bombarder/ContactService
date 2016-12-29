@@ -2,7 +2,6 @@ package parserService;
 
 import annotations.CustomDateFormat;
 import annotations.JsonValue;
-import org.apache.commons.lang3.mutable.MutableInt;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
@@ -10,6 +9,9 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.TemporalAccessor;
 import java.util.HashMap;
+import java.util.Map;
+
+import static parserService.ParserState.*;
 
 public class JsonParser {
 
@@ -53,7 +55,7 @@ public class JsonParser {
 
     public static <T> T fromJson(String json, Class<T> clazz) throws Exception {
 
-        HashMap map = jsonToMapConverter(json);
+        Map<String, Object> map = jsonToMapConverter(json);
 
         T externalClassInstance = clazz.newInstance();
 
@@ -97,49 +99,56 @@ public class JsonParser {
         return externalClassInstance;
     }
 
-    private static HashMap jsonToMapConverter(String json) {
+    private static Map<String, Object> jsonToMapConverter(String json) {
 
-        HashMap<String, Object> map = new HashMap<>();
+        Map<String, Object> map = new HashMap<>();
 
         String key = "";
         String value = "";
-        boolean inKey = false;
-        boolean inValue = false;
+        ParserState state = NOT_IN_OBJECT;
+        int counter = 0;
 
-        MutableInt counter = new MutableInt();
+        while (counter < json.length()) {
+            char character = json.charAt(counter);
+            counter++;
 
-        while (counter.getValue() < json.length()) {
-            if (json.charAt(counter.getValue()) == '{') {
-                counter.increment();
-            } else if (json.charAt(counter.getValue()) == ':') {
-                counter.increment();
-                if (json.charAt(counter.getValue()) == '\"') {
-                    inValue = !inValue;
-                    counter.increment();
-                    while (inValue) {
-                        value += json.charAt(counter.getValue());
-                        counter.increment();
-                        if (json.charAt(counter.getValue()) == '\"') {
-                            break;
-                        }
-                    }
+            if (state == NOT_IN_OBJECT && character == '{') {
+                state = KEY_WAITING;
+
+            } else if (character == '}') {
+                state = NOT_IN_OBJECT;
+
+            } else if (state == KEY_WAITING && character == '"') {
+                state = IN_KEY;
+
+            } else if (state == IN_KEY) {
+                if (character != '"') {
+                    key += character;
+                } else {
+                    state = COLON_WAITING;
                 }
-                counter.increment();
-            } else if (json.charAt(counter.getValue()) == '\"') {
-                inKey = !inKey;
-                counter.increment();
-                while (inKey) {
-                    key += json.charAt(counter.getValue());
-                    counter.increment();
-                    if (json.charAt(counter.getValue()) == '\"') {
-                        break;
-                    }
+
+            } else if (state == COLON_WAITING && character == ':') {
+                state = VALUE_WAITING;
+
+            } else if (state == VALUE_WAITING && character == '"') {
+                state = IN_VALUE;
+
+            } else if (state == IN_VALUE) {
+                if (character != '"') {
+                    value += character;
+                } else {
+                    state = COMMA_WAITING;
+                    map.put(key, value);
+                    key = "";
+                    value = "";
                 }
-            } else {
-                counter.increment();
+
+            } else if (state == COMMA_WAITING && character == ',') {
+                state = KEY_WAITING;
             }
+
         }
-        map.put(key,value);
         return map;
     }
 }

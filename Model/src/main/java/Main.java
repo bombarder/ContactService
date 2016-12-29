@@ -16,7 +16,8 @@ public class Main {
 //        System.out.println(s);
 
         //language=JSON
-        String message = "{\"firstName\":\"Vova\"}";
-        JsonParser.fromJson(message, Customer.class);
+        String message = "{\"age\":\"7\"}";
+        Customer customer1 = JsonParser.fromJson(message, Customer.class);
+        System.out.println(customer1);
     }
 }
